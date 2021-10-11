@@ -4,12 +4,20 @@ import sqlite3
 from pathlib import Path
 
 def load_data(messages_filepath, categories_filepath):
+    """ loads data.
+    Keyword arguments:
+    messages_filepath -- filepath to messages
+    categories_filepath -- filepath to categories
+    """
+    
     messages = pd.read_csv(str(messages_filepath)) 
     categories = pd.read_csv(str(categories_filepath)) 
     df = pd.merge(messages, categories, on="id") 
     return df
 
 def clean_data(df):
+    """ cleans data.
+    """
     categories = df.categories.str.split(";", expand=True)
     row = categories.iloc[0,:]
     category_colnames = [x[:-2] for x in row]
@@ -25,11 +33,21 @@ def clean_data(df):
     return df
 
 def save_data(df, database_filename):
+    """ saves data.
+    keyword arguments:
+    df -- dataframe
+    database_filename -- name of database.
+    """
+    
     conn = sqlite3.connect(database_filename)
     database_filename = Path(database_filename).stem
     df.to_sql(database_filename, conn, index=False) 
     
 def main():
+    """ main function to receive the filepath for messages, categories, and database. 
+    this function loads, cleans, and saves the data 
+    """
+    
     if len(sys.argv) == 4:
 
         messages_filepath, categories_filepath, database_filepath = sys.argv[1:]
