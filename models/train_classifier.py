@@ -6,8 +6,11 @@ import re
 import numpy as np
 import pandas as pd
 import pickle
+import nltk
 from nltk.tokenize import word_tokenize
 from nltk.stem import WordNetLemmatizer
+nltk.download('stopwords')
+from nltk.corpus import stopwords
 
 from sklearn.metrics import classification_report
 from sklearn.model_selection import GridSearchCV, train_test_split
@@ -29,9 +32,11 @@ def load_data(database_filepath):
     conn = sqlite3.connect(database_filepath)
     df = pd.read_sql("SELECT * FROM "+database_filename, conn)
     X = df.message.values
-    Y = df.iloc[:, 4:].values
+    Y = df.iloc[:, 2:].values
     category_names = [str(i) for i in np.unique(Y)]
     return X, Y, category_names
+
+sw_nltk = stopwords.words('english')
 
 def tokenize(text):
     """ tockenizes a test.
@@ -43,7 +48,7 @@ def tokenize(text):
     text = re.sub(r'[^\w\s]','', text)
     token = word_tokenize(text)
     lemmatizer = WordNetLemmatizer()
-    clean_tokens = [lemmatizer.lemmatize(tok).lower().strip() for tok in token]
+    clean_tokens = [lemmatizer.lemmatize(tok).lower().strip() for tok in token if tok not in sw_nltk]
     return clean_tokens
   
 def build_model():
@@ -63,7 +68,7 @@ def build_model():
         'features__text_pipeline__vect__ngram_range': ((1, 1), (1, 2)),
         'features__text_pipeline__vect__max_df': (0.5, 0.75, 1.0),
         'features__text_pipeline__vect__max_features': (None, 5000, 10000),
-        'clf__estimator__n_estimators': [50, 100, 200],
+        'clf__estimator__n_estimators': np.arange(50,900,50).tolist(),
         'clf__estimator__min_samples_split': [2, 3, 4]
     }
     cv = GridSearchCV(pipeline, param_grid=parameters, verbose=4, n_jobs=-1)

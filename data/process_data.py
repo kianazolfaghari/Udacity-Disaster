@@ -28,7 +28,9 @@ def clean_data(df):
         categories[column] = categories[column].astype('int')
     
     df = pd.concat([df, categories], axis = 1)
-    df = df.drop(['categories'], axis = 1)
+    df = df.drop(['categories', 'original', 'genre'], axis = 1)
+    for i in range(2, df.shape[1]):
+        df = df[df.iloc[:,i].isin([0,1])]
     df = df.drop_duplicates()
     return df
 
@@ -41,7 +43,7 @@ def save_data(df, database_filename):
     
     conn = sqlite3.connect(database_filename)
     database_filename = Path(database_filename).stem
-    df.to_sql(database_filename, conn, index=False) 
+    df.to_sql(database_filename, conn, index=False, if_exists='replace') 
     
 def main():
     """ main function to receive the filepath for messages, categories, and database. 
