@@ -43,6 +43,9 @@ def index():
     genre_counts = df.groupby('genre').count()['message']
     genre_names = list(genre_counts.index)
     
+    X_New_visual = list(genre_counts.index)
+    Y_New_visual = df.groupby('genre').cumsum()['message']
+    
     # create visuals
     # TODO: Below is an example - modify to create your own visuals
     graphs = [
@@ -65,7 +68,27 @@ def index():
             }
         }
     ]
-    
+
+    graphs = [
+        {
+            'data': [
+                Bar(
+                    x=X_New_visual,
+                    y=Y_New_visual
+                )
+            ],
+
+            'layout': {
+                'title': 'New Visual',
+                'yaxis': {
+                    'title': "Sum"
+                },
+                'xaxis': {
+                    'title': "Genre"
+                }
+            }
+        }
+    ]    
     # encode plotly graphs in JSON
     ids = ["graph-{}".format(i) for i, _ in enumerate(graphs)]
     graphJSON = json.dumps(graphs, cls=plotly.utils.PlotlyJSONEncoder)

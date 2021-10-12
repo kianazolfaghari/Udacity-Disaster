@@ -28,8 +28,8 @@ def clean_data(df):
         categories[column] = categories[column].astype('int')
     
     df = pd.concat([df, categories], axis = 1)
-    df = df.drop(['categories', 'original', 'genre'], axis = 1)
-    for i in range(2, df.shape[1]):
+    df = df.drop(['categories'], axis = 1)
+    for i in range(4, df.shape[1]):
         df = df[df.iloc[:,i].isin([0,1])]
     df = df.drop_duplicates()
     return df

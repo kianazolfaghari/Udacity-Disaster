@@ -32,7 +32,7 @@ def load_data(database_filepath):
     conn = sqlite3.connect(database_filepath)
     df = pd.read_sql("SELECT * FROM "+database_filename, conn)
     X = df.message.values
-    Y = df.iloc[:, 2:].values
+    Y = df.iloc[:, 4:].values
     category_names = [str(i) for i in np.unique(Y)]
     return X, Y, category_names
 
